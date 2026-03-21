@@ -91,20 +91,20 @@ node dist/index.js --now
 
 ## Environment variables
 
-| Variable | Required | Description |
-|---|---|---|
-| `ANTHROPIC_API_KEY` | Yes | Claude API key for semantic matching |
-| `SMTP_HOST` | Yes | SMTP server host |
-| `SMTP_PORT` | No | SMTP port (default: 587) |
-| `SMTP_SECURE` | No | Use TLS (default: false) |
-| `SMTP_USER` | Yes | SMTP auth user |
-| `SMTP_PASS` | Yes | SMTP auth password |
-| `EMAIL_FROM` | Yes | Sender address |
-| `EMAIL_TO` | Yes | Recipient address |
-| `CRON_SCHEDULE` | No | Cron expression (default: `30 11 * * *` = 8:30 AM UY) |
-| `FETCH_DAYS_BACK` | No | Days to look back (default: 1) |
-| `DEPARTMENT_ID_MAX` | No | Max department ID to iterate (default: 30) |
-| `DEPARTMENT_IDS` | No | Explicit comma-separated list of department IDs |
+| Variable            | Required | Description                                           |
+| ------------------- | -------- | ----------------------------------------------------- |
+| `ANTHROPIC_API_KEY` | Yes      | Claude API key for semantic matching                  |
+| `SMTP_HOST`         | Yes      | SMTP server host                                      |
+| `SMTP_PORT`         | No       | SMTP port (default: 587)                              |
+| `SMTP_SECURE`       | No       | Use TLS (default: false)                              |
+| `SMTP_USER`         | Yes      | SMTP auth user                                        |
+| `SMTP_PASS`         | Yes      | SMTP auth password                                    |
+| `EMAIL_FROM`        | Yes      | Sender address                                        |
+| `EMAIL_TO`          | Yes      | Recipient address                                     |
+| `CRON_SCHEDULE`     | No       | Cron expression (default: `30 11 * * *` = 8:30 AM UY) |
+| `FETCH_DAYS_BACK`   | No       | Days to look back (default: 1)                        |
+| `DEPARTMENT_ID_MAX` | No       | Max department ID to iterate (default: 30)            |
+| `DEPARTMENT_IDS`    | No       | Explicit comma-separated list of department IDs       |
 
 ## Project structure
 

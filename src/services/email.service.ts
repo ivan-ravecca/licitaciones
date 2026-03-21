@@ -1,4 +1,4 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import { EmailReport, MatchedItem } from '../types';
 import { AppConfig } from '../types';
 
@@ -77,32 +77,37 @@ function buildTextEmail(report: EmailReport): string {
 }
 
 export async function sendReport(report: EmailReport, appConfig: AppConfig): Promise<void> {
-  const transporter = nodemailer.createTransport({
-    host: appConfig.smtp.host,
-    port: appConfig.smtp.port,
-    secure: appConfig.smtp.secure,
-    auth: {
-      user: appConfig.smtp.user,
-      pass: appConfig.smtp.pass,
-    },
-  });
-
   const subject =
     report.totalMatched > 0
       ? `✅ Licitaciones: ${report.totalMatched} coincidencia(s) - ${report.date}`
       : `📋 Licitaciones: Sin coincidencias - ${report.date}`;
 
-  // await transporter.sendMail({
-  //   from: appConfig.email.from,
-  //   to: appConfig.email.to,
-  //   subject,
-  //   text: buildTextEmail(report),
-  //   html: buildHtmlEmail(report),
-  // });
+  if (!appConfig.isProduction) {
+    console.log('[email] Non-production mode — skipping send. Email content:');
+    console.log(`  Subject : ${subject}`);
+    console.log(`  From    : ${appConfig.email.from}`);
+    console.log(`  To      : ${appConfig.email.to}`);
+    console.log('--- TEXT ---');
+    console.log(buildTextEmail(report));
+    console.log('--- END ---');
+    return;
+  }
 
-  console.log(`[email] Would send email with subject: ${subject}`);
-  console.log(`[email] To: ${appConfig.email.to}`);
-  console.log(`[email] Text content:\n${buildTextEmail(report)}`);
+  const resend = new Resend(appConfig.resendApiKey);
 
-  console.log(`[email] Report sent to ${appConfig.email.to}`);
+  const response = await resend.emails.send({
+    from: appConfig.email.from,
+    to: appConfig.email.to,
+    subject,
+    text: buildTextEmail(report),
+    html: buildHtmlEmail(report),
+  });
+
+  if (response.error) {
+    throw new Error(`[email] Resend failed: ${response.error.message}`);
+  }
+
+  console.log(
+    `[email] Report sent to ${appConfig.email.to}. Id: ${response.data?.id ?? 'unknown'}`,
+  );
 }

@@ -7,10 +7,7 @@ const BATCH_SIZE = 20;
 function buildPrompt(items: RssItem[], keywords: string[]): string {
   const keywordList = keywords.map((k) => `- "${k}"`).join('\n');
   const itemList = items
-    .map(
-      (item, i) =>
-        `[${i}] TITLE: ${item.title}\nDESCRIPTION: ${item.description}`,
-    )
+    .map((item, i) => `[${i}] TITLE: ${item.title}\nDESCRIPTION: ${item.description}`)
     .join('\n\n');
 
   return `You are analyzing Uruguay government procurement announcements to find matches for a supplier's products.
@@ -59,16 +56,26 @@ export async function matchItems(
   for (let i = 0; i < items.length; i += BATCH_SIZE) {
     const batch = items.slice(i, i + BATCH_SIZE);
     const prompt = buildPrompt(batch, keywords);
+    const payload = {
+      model: config.anthropicModel,
+      max_tokens: 2048,
+      messages: [{ role: 'user' as const, content: prompt }],
+    };
+
+    console.log(
+      `[matcher] Anthropic payload for batch ${i}-${i + batch.length - 1}: ${JSON.stringify(payload)}`,
+    );
 
     try {
-      const response = await client.messages.create({
-        model: config.anthropicModel,
-        max_tokens: 2048,
-        messages: [{ role: 'user', content: prompt }],
-      });
+      const response = await client.messages.create(payload);
 
-      const text =
-        response.content[0]?.type === 'text' ? response.content[0].text : '';
+      const raw = response.content[0]?.type === 'text' ? response.content[0].text : '';
+
+      // Strip markdown code fences if the model wraps the response
+      const text = raw
+        .replace(/^```(?:json)?\s*/i, '')
+        .replace(/\s*```$/i, '')
+        .trim();
 
       const parsed: Array<{
         index: number;

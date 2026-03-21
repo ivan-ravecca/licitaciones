@@ -54,6 +54,7 @@ export async function fetchDepartmentItems(
   daysBack: number,
 ): Promise<RssItem[]> {
   const url = buildRssUrl(departmentId, daysBack);
+  console.log(`[rss] Department ${departmentId} URL: ${url}`);
 
   try {
     const feed = await parser.parseURL(url);

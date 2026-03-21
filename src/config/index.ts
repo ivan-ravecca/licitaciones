@@ -1,43 +1,30 @@
-import dotenv from 'dotenv';
 import { AppConfig } from '../types';
-
-dotenv.config();
-
-function requireEnv(key: string): string {
-  const value = process.env[key];
-  if (!value) {
-    throw new Error(`Missing required environment variable: ${key}`);
-  }
-  return value;
-}
+import { env } from './env';
 
 function parseDepartmentIds(): number[] {
-  const explicit = process.env['DEPARTMENT_IDS'];
+  const explicit = env.DEPARTMENT_IDS;
   if (explicit) {
     return explicit
       .split(',')
       .map((id) => parseInt(id.trim(), 10))
       .filter((id) => !isNaN(id));
   }
-  const max = parseInt(process.env['DEPARTMENT_ID_MAX'] ?? '30', 10);
+  const max = env.DEPARTMENT_ID_MAX;
   return Array.from({ length: max }, (_, i) => i + 1);
 }
 
 export const config: AppConfig = {
-  anthropicApiKey: requireEnv('ANTHROPIC_API_KEY'),
-  anthropicModel: requireEnv('ANTHROPIC_MODEL'),
-  smtp: {
-    host: requireEnv('SMTP_HOST'),
-    port: parseInt(process.env['SMTP_PORT'] ?? '587', 10),
-    secure: process.env['SMTP_SECURE'] === 'true',
-    user: requireEnv('SMTP_USER'),
-    pass: requireEnv('SMTP_PASS'),
-  },
+  anthropicApiKey: env.ANTHROPIC_API_KEY,
+  anthropicModel: env.ANTHROPIC_MODEL,
+  resendApiKey: env.RESEND_API_KEY,
+  port: env.PORT,
+  isProduction: env.NODE_ENV === 'production',
   email: {
-    from: requireEnv('EMAIL_FROM'),
-    to: requireEnv('EMAIL_TO'),
+    from: env.EMAIL_FROM,
+    to: env.EMAIL_TO,
   },
-  cronSchedule: process.env['CRON_SCHEDULE'] ?? '30 11 * * *',
-  fetchDaysBack: parseInt(process.env['FETCH_DAYS_BACK'] ?? '1', 10),
+  cronSchedule: env.CRON_SCHEDULE,
+  fetchDaysBack: env.FETCH_DAYS_BACK,
   departmentIds: parseDepartmentIds(),
+  triggerToken: env.TRIGGER_TOKEN,
 };

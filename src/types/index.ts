@@ -26,14 +26,10 @@ export interface EmailReport {
 
 export interface AppConfig {
   anthropicApiKey: string;
-  anthropicModel: string; 
-  smtp: {
-    host: string;
-    port: number;
-    secure: boolean;
-    user: string;
-    pass: string;
-  };
+  anthropicModel: string;
+  resendApiKey: string;
+  port: number;
+  isProduction: boolean;
   email: {
     from: string;
     to: string;
@@ -41,4 +37,5 @@ export interface AppConfig {
   cronSchedule: string;
   fetchDaysBack: number;
   departmentIds: number[];
+  triggerToken?: string;
 }
