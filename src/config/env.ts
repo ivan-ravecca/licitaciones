@@ -1,19 +1,10 @@
-import fs from 'node:fs';
-import path from 'node:path';
 import dotenv from 'dotenv';
 import { z } from 'zod';
 
-const envPath = path.resolve(process.cwd(), '.env');
+// Optional .env support for local development; Plesk provides env vars directly.
+dotenv.config();
 
-if (!fs.existsSync(envPath)) {
-  throw new Error(`Missing .env file at ${envPath}`);
-}
-
-const fileEnv = dotenv.parse(fs.readFileSync(envPath));
-const rawEnv = {
-  ...fileEnv,
-  ...process.env,
-};
+const rawEnv = process.env;
 
 const envSchema = z
   .object({

@@ -141,6 +141,8 @@ function startHttpServer(): void {
 
       triggerRun('http').catch((err) => {
         console.error('[licitaciones] HTTP-triggered run failed:', err);
+        res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+        res.end(`[licitaciones] HTTP-triggered run failed: ${err instanceof Error ? err.message : String(err)}`);
       });
 
       res.writeHead(202, { 'Content-Type': 'text/plain; charset=utf-8' });
@@ -149,7 +151,7 @@ function startHttpServer(): void {
     }
 
     res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
-    res.end('hola mundo');
+    res.end('hola mundo!!');
   });
 
   server.listen(config.port, () => {
