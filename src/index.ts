@@ -122,7 +122,9 @@ function isAuthorized(url: URL): boolean {
 
 function startHttpServer(): void {
   const server = http.createServer((req, res) => {
-    const requestUrl = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
+    const proto = req.headers['x-forwarded-proto'] ?? 'http';
+    const scheme = Array.isArray(proto) ? proto[0] : proto;
+    const requestUrl = new URL(req.url ?? '/', `${scheme}://${req.headers.host ?? 'localhost'}`);
 
     if (requestUrl.searchParams.get('run') === '1') {
       if (!isAuthorized(requestUrl)) {
