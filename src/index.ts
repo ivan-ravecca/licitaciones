@@ -126,6 +126,32 @@ function startHttpServer(): void {
     const scheme = Array.isArray(proto) ? proto[0] : proto;
     const requestUrl = new URL(req.url ?? '/', `${scheme}://${req.headers.host ?? 'localhost'}`);
 
+    if (requestUrl.searchParams.get('status') === '1') {
+      const montevideoNow = new Date().toLocaleString('es-UY', {
+        timeZone: 'America/Montevideo',
+        hour12: false,
+      });
+
+      res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+      res.end(
+        JSON.stringify(
+          {
+            ok: true,
+            cronSchedule: config.cronSchedule,
+            timezone: 'America/Montevideo',
+            montevideoNow,
+            serverNow: new Date().toISOString(),
+            nodeEnv: config.isProduction ? 'production' : 'non-production',
+            port: config.port,
+            runInProgress: Boolean(activeRun),
+          },
+          null,
+          2,
+        ),
+      );
+      return;
+    }
+
     if (requestUrl.searchParams.get('run') === '1') {
       if (!isAuthorized(requestUrl)) {
         res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
@@ -141,8 +167,6 @@ function startHttpServer(): void {
 
       triggerRun('http').catch((err) => {
         console.error('[licitaciones] HTTP-triggered run failed:', err);
-        res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
-        res.end(`[licitaciones] HTTP-triggered run failed: ${err instanceof Error ? err.message : String(err)}`);
       });
 
       res.writeHead(202, { 'Content-Type': 'text/plain; charset=utf-8' });

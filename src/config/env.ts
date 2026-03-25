@@ -14,7 +14,7 @@ const envSchema = z
     EMAIL_FROM: z.string().email(),
     EMAIL_TO: z.string().email(),
     PORT: z.coerce.number().int().positive().default(3000),
-    CRON_SCHEDULE: z.string().default('30 8 * * 1-5'),
+    CRON_SCHEDULE: z.string().default('0 17 * * 1-5'),
     FETCH_DAYS_BACK: z.coerce.number().int().positive().default(1),
     DEPARTMENT_ID_MAX: z.coerce.number().int().positive().default(30),
     DEPARTMENT_IDS: z.string().optional(),

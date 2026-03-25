@@ -6,7 +6,7 @@ Fetches procurement announcements across all configured departments, uses Claude
 
 ## How it works
 
-1. Runs every day at 8:30 AM (Uruguay time) via `node-cron`.
+1. Runs every weekday at 5:00 PM (Uruguay time) via `node-cron`.
 2. Fetches the RSS feed for each configured department ID.
 3. Sends all items to Claude in batches to find semantic keyword matches.
 4. Sends an HTML email report with matched items and direct links.
@@ -84,7 +84,7 @@ node dist/index.js --now
 2. Set the **Application startup file** to `dist/index.js`.
 3. Add environment variables in the Plesk Node.js panel (same as `.env`).
 4. Run `npm install && npm run build` via SSH.
-5. Start the application from the Plesk panel — `node-cron` keeps it running and fires at 8:30 AM daily.
+5. Start the application from the Plesk panel — `node-cron` keeps it running and fires at 5:00 PM on weekdays.
 
 > **Note:** Keep the app running continuously so `node-cron` can trigger on schedule.
 > Plesk's "Keep alive" or a process manager like PM2 is recommended.
@@ -101,7 +101,7 @@ node dist/index.js --now
 | `SMTP_PASS`         | Yes      | SMTP auth password                                    |
 | `EMAIL_FROM`        | Yes      | Sender address                                        |
 | `EMAIL_TO`          | Yes      | Recipient address                                     |
-| `CRON_SCHEDULE`     | No       | Cron expression (default: `30 11 * * *` = 8:30 AM UY) |
+| `CRON_SCHEDULE`     | No       | Cron expression (default: `0 17 * * 1-5` = 5:00 PM UY, Monday-Friday) |
 | `FETCH_DAYS_BACK`   | No       | Days to look back (default: 1)                        |
 | `DEPARTMENT_ID_MAX` | No       | Max department ID to iterate (default: 30)            |
 | `DEPARTMENT_IDS`    | No       | Explicit comma-separated list of department IDs       |
