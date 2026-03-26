@@ -120,13 +120,21 @@ function isAuthorized(url: URL): boolean {
   return url.searchParams.get('token') === config.triggerToken;
 }
 
+function isHealthRequest(url: URL): boolean {
+  return url.pathname === '/health';
+}
+
+function isRunRequest(url: URL): boolean {
+  return url.searchParams.get('run') === '1';
+}
+
 function startHttpServer(): void {
   const server = http.createServer((req, res) => {
     const proto = req.headers['x-forwarded-proto'] ?? 'http';
     const scheme = Array.isArray(proto) ? proto[0] : proto;
     const requestUrl = new URL(req.url ?? '/', `${scheme}://${req.headers.host ?? 'localhost'}`);
 
-    if (requestUrl.searchParams.get('status') === '1') {
+    if (isHealthRequest(requestUrl)) {
       const montevideoNow = new Date().toLocaleString('es-UY', {
         timeZone: 'America/Montevideo',
         hour12: false,
@@ -152,7 +160,7 @@ function startHttpServer(): void {
       return;
     }
 
-    if (requestUrl.searchParams.get('run') === '1') {
+    if (isRunRequest(requestUrl)) {
       if (!isAuthorized(requestUrl)) {
         res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
         res.end('forbidden');
