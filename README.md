@@ -25,7 +25,7 @@ npm install
 cp .env.example .env
 ```
 
-Edit `.env` with your SMTP credentials, Anthropic API key, and target email.
+Edit `.env` with your Resend API key, Anthropic API key/model, and target email.
 
 ### 3) Configure keywords
 
@@ -89,22 +89,42 @@ node dist/index.js --now
 > **Note:** Keep the app running continuously so `node-cron` can trigger on schedule.
 > Plesk's "Keep alive" or a process manager like PM2 is recommended.
 
+## UptimeRobot setup (recommended for Plesk/shared hosting)
+
+Use UptimeRobot only for health checks and optional keep-alive. Do not use it to trigger a full run.
+
+1. Deploy and run the app.
+2. Open `https://YOUR_DOMAIN/?status=1` or `https://YOUR_DOMAIN/health`.
+3. Confirm JSON response with `ok: true`.
+4. In UptimeRobot, create an **HTTP(s)** monitor:
+  - Friendly name: `licitaciones-health`
+  - URL: `https://YOUR_DOMAIN/health`
+  - Monitoring interval: `5 minutes`
+  - Method: `GET`
+5. Save and verify monitor status turns **Up**.
+
+### Important safety note
+
+- `GET /health` (or `?status=1`) is safe for monitoring.
+- `GET /run` (or `?run=1`) starts a full job: RSS fetch + Anthropic matching + email send.
+- Never point UptimeRobot to `/run`, otherwise you'll increase API usage and costs.
+
 ## Environment variables
 
 | Variable            | Required | Description                                           |
 | ------------------- | -------- | ----------------------------------------------------- |
 | `ANTHROPIC_API_KEY` | Yes      | Claude API key for semantic matching                  |
-| `SMTP_HOST`         | Yes      | SMTP server host                                      |
-| `SMTP_PORT`         | No       | SMTP port (default: 587)                              |
-| `SMTP_SECURE`       | No       | Use TLS (default: false)                              |
-| `SMTP_USER`         | Yes      | SMTP auth user                                        |
-| `SMTP_PASS`         | Yes      | SMTP auth password                                    |
+| `ANTHROPIC_MODEL`   | Yes      | Anthropic model id (for example `claude-3-5-sonnet-20241022`) |
+| `RESEND_API_KEY`    | Yes      | Resend API key for email delivery                     |
 | `EMAIL_FROM`        | Yes      | Sender address                                        |
 | `EMAIL_TO`          | Yes      | Recipient address                                     |
+| `PORT`              | No       | HTTP port for status/run endpoints (default: 3000)    |
 | `CRON_SCHEDULE`     | No       | Cron expression (default: `0 17 * * 1-5` = 5:00 PM UY, Monday-Friday) |
 | `FETCH_DAYS_BACK`   | No       | Days to look back (default: 1)                        |
 | `DEPARTMENT_ID_MAX` | No       | Max department ID to iterate (default: 30)            |
 | `DEPARTMENT_IDS`    | No       | Explicit comma-separated list of department IDs       |
+| `TRIGGER_TOKEN`     | No       | Token required by `?run=1` / `/run` when set          |
+| `NODE_ENV`          | No       | `development`, `production`, or `test` (default: `development`) |
 
 ## Project structure
 
